@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Users</title>
+  <meta charset="UTF-8">
+  <style>
+    #user_list {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .edit_item {
+      margin-bottom: 10px;
+    }
+    table {
+      margin: 25px;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    th, td {
+      border-bottom: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+<div id="user_list">
+  <table>
+    <p> user list</p>
+    <th>Username</th>
+    <th>Password</th>
+    <tr th:each="user: ${userList}">
+      <td th:text="${user.getUsername()}"></td>
+      <td th:text="${user.getPassword()}"></td>
+    </tr>
+  </table>
+  <br>
+  <div>
+    <p>create user</p>
+    <form method="post" th:object="${newUser}" th:action="@{/login}">
+      <input class="edit_item" type="text" placeholder="enter name" th:field="*{username}">
+      <input class="edit_item" type="password" th:field="*{password}" placeholder = "enter password">
+      <input class="edit_item" type="submit" value="create!">
+    </form>
+    <a th:href="@{/login}"> Goto login page </a>
+  </div>
+</div>
+</body>
+</html>
