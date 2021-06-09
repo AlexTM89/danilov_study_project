@@ -1,5 +1,6 @@
 package org.example.app.services;
 
+import org.apache.log4j.Logger;
 import org.example.web.dto.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 public class BookService {
 
     private final ProjectRepository<Book> bookRepo;
+    private Logger logger = Logger.getLogger(LoginService.class);
 
     @Autowired
     public BookService(ProjectRepository<Book> bookRepo) {
@@ -23,6 +25,15 @@ public class BookService {
     }
 
     public void saveBook(Book book) {
+        // проверим книгу на незаполненные поля
+        Boolean isNotEmpty = !book.getAuthor().isEmpty() ||
+                !book.getTitle().isEmpty() ||
+                book.getSize() != null;
+        if (isNotEmpty) {
+            logger.info("current repository size: " + getAllBooks().size());
+        } else {
+            logger.warn("cannot save empty book");
+        }
         bookRepo.store(book);
     }
 
@@ -34,18 +45,20 @@ public class BookService {
         if (filterBook == null) {
             return getAllBooks();
         }
-        if (filterBook.getTitle() == null || filterBook.getTitle() == "") {
+        // чтобы пустые поля фильтра не влияли на поиск - заменим их на регулярку, которая не будет на него влиять
+        if (filterBook.getTitle() == null || "".equals(filterBook.getTitle())) {
             filterBook.setTitle(".*");
         }
-        if (filterBook.getAuthor() == null || filterBook.getAuthor() == "") {
+        if (filterBook.getAuthor() == null || "".equals(filterBook.getAuthor())) {
             filterBook.setAuthor(".*");
         }
-        String filteredBookSize = null;
+        String filteredBookSize;
         if (filterBook.getSize() != null) {
             filteredBookSize = filterBook.getSize().toString();
         } else {
             filteredBookSize = ".*";
         }
+
         // проверяем каждую книгу, обращаем внимание, что у ее полей может быть значение null
         String finalFilteredBookSize = filteredBookSize;
         return bookRepo.retrieveAll()
@@ -64,5 +77,13 @@ public class BookService {
 
                 }
                 ).collect(Collectors.toList());
+    }
+
+    public void removeBookByFilter(Book book) {
+        // найдем по переданным данным все книги на удаление, и удалим их
+        List<Book> booksToBeDeleted = getBooksFiltered(book);
+        booksToBeDeleted.stream().forEach(b -> {
+            removeBookById(b.getId());
+        });
     }
 }
