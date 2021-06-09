@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class BookService {
 
     private final ProjectRepository<Book> bookRepo;
-    private Logger logger = Logger.getLogger(LoginService.class);
+    private final Logger logger = Logger.getLogger(LoginService.class);
 
     @Autowired
     public BookService(ProjectRepository<Book> bookRepo) {
@@ -26,7 +26,7 @@ public class BookService {
 
     public void saveBook(Book book) {
         // проверим книгу на незаполненные поля
-        Boolean isNotEmpty = !book.getAuthor().isEmpty() ||
+        boolean isNotEmpty = !book.getAuthor().isEmpty() ||
                 !book.getTitle().isEmpty() ||
                 book.getSize() != null;
         if (isNotEmpty) {
@@ -38,7 +38,13 @@ public class BookService {
     }
 
     public boolean removeBookById(Integer bookIdToRemove) {
-        return bookRepo.removeItemById(bookIdToRemove);
+        boolean isDeleted =bookRepo.removeItemById(bookIdToRemove);
+        if (isDeleted) {
+            logger.info("deleted book with id " + bookIdToRemove);
+        } else {
+            logger.warn("cannot delete book with id " + bookIdToRemove);
+        }
+        return isDeleted;
     }
 
     public List<Book> getBooksFiltered(Book filterBook) {
@@ -64,9 +70,8 @@ public class BookService {
         return bookRepo.retrieveAll()
                 .stream()
                 .filter(book -> {
-                    BiFunction<String, String, Boolean> compareWithNull = (s1, s2) -> {
-                        return (s1 == null & ".*".equals(s2)) || (s1 != null && s1.matches(s2));
-                    };
+                    BiFunction<String, String, Boolean> compareWithNull = (s1, s2) ->
+                            (s1 == null & ".*".equals(s2)) || (s1 != null && s1.matches(s2));
                     String bookSize = null;
                     if (book.getSize() != null) {
                         bookSize = book.getSize().toString();
@@ -82,8 +87,6 @@ public class BookService {
     public void removeBookByFilter(Book book) {
         // найдем по переданным данным все книги на удаление, и удалим их
         List<Book> booksToBeDeleted = getBooksFiltered(book);
-        booksToBeDeleted.stream().forEach(b -> {
-            removeBookById(b.getId());
-        });
+        booksToBeDeleted.forEach(b -> removeBookById(b.getId()));
     }
 }

@@ -6,19 +6,17 @@ import org.example.web.dto.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping(value = "/books")
 public class BookShelfController {
 
-    private Logger logger = Logger.getLogger(BookShelfController.class);
-    private BookService bookService;
+    private final Logger logger = Logger.getLogger(BookShelfController.class);
+    private final BookService bookService;
 
     @Autowired
     public BookShelfController(BookService bookService) {
@@ -42,7 +40,9 @@ public class BookShelfController {
     @PostMapping("/remove")
     public String removeBook(@RequestParam(value = "bookIdToRemove") String bookIdToRemove) {
         // залипуха, чтобы можно было большие id вводить
-        Integer idToRemove = null;
+        // не стал переносить в сервис, чтобы не делать второй метод удаления по строке
+        // здесь просто небольшое преобразование входных данных, не логика
+        int idToRemove;
         try {
             idToRemove = Integer.parseInt(bookIdToRemove);
         } catch (NumberFormatException nfe) {
@@ -70,10 +70,8 @@ public class BookShelfController {
         filterBook.setAuthor(author);
         filterBook.setSize(size);
         filterBook.setTitle(title);
-        //
 
-        System.out.println(Arrays.toString(bookService.getBooksFiltered(filterBook).toArray()));
-        model.addAttribute("modelList", bookService.getBooksFiltered(filterBook));
+        model.addAttribute("bookList", bookService.getBooksFiltered(filterBook));
         model.addAttribute("book", new Book());
         return "book_shelf";
     }
