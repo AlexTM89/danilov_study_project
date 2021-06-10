@@ -31,10 +31,10 @@ public class BookService {
                 book.getSize() != null;
         if (isNotEmpty) {
             logger.info("current repository size: " + getAllBooks().size());
+            bookRepo.store(book);
         } else {
             logger.warn("cannot save empty book");
         }
-        bookRepo.store(book);
     }
 
     public boolean removeBookById(Integer bookIdToRemove) {
