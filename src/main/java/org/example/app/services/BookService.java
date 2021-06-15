@@ -2,7 +2,11 @@ package org.example.app.services;
 
 import org.apache.log4j.Logger;
 import org.example.web.dto.Book;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,10 +14,10 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 @Service
-public class BookService {
+public class BookService implements DisposableBean, BeanPostProcessor {
 
     private final ProjectRepository<Book> bookRepo;
-    private final Logger logger = Logger.getLogger(LoginService.class);
+    private final Logger logger = Logger.getLogger(BookService.class);
 
     @Autowired
     public BookService(ProjectRepository<Book> bookRepo) {
@@ -88,5 +92,22 @@ public class BookService {
         // найдем по переданным данным все книги на удаление, и удалим их
         List<Book> booksToBeDeleted = getBooksFiltered(book);
         booksToBeDeleted.forEach(b -> removeBookById(b.getId()));
+    }
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        logger.info("invoked postProcessBeforeInitialization for " + beanName);
+        return null;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        logger.info("invoked postProcessAfterInitialization for " + beanName);
+        return null;
+    }
+
+    @Override
+    public void destroy() throws Exception {
+        logger.info("invoked destroy from DisposableBean");
     }
 }

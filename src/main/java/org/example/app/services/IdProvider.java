@@ -6,10 +6,13 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
+@Component
 public class IdProvider implements InitializingBean, DisposableBean, BeanPostProcessor {
     public String provideId(Book book) {
         return this.hashCode() + "_" + book.hashCode();

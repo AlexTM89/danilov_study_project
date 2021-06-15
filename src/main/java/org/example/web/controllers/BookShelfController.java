@@ -39,16 +39,7 @@ public class BookShelfController {
 
     @PostMapping("/remove")
     public String removeBook(@RequestParam(value = "bookIdToRemove") String bookIdToRemove) {
-        // залипуха, чтобы можно было большие id вводить
-        // не стал переносить в сервис, чтобы не делать второй метод удаления по строке
-        // здесь просто небольшое преобразование входных данных, не логика
-        int idToRemove;
-        try {
-            idToRemove = Integer.parseInt(bookIdToRemove);
-        } catch (NumberFormatException nfe) {
-            idToRemove = 0;
-        }
-        bookService.removeBookById(idToRemove);
+        bookService.removeBookById(bookIdToRemove);
         return "redirect:/books/shelf";
     }
 
