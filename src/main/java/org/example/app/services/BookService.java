@@ -37,7 +37,7 @@ public class BookService {
         }
     }
 
-    public boolean removeBookById(Integer bookIdToRemove) {
+    public boolean removeBookById(String bookIdToRemove) {
         boolean isDeleted =bookRepo.removeItemById(bookIdToRemove);
         if (isDeleted) {
             logger.info("deleted book with id " + bookIdToRemove);
