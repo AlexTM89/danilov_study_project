@@ -36,12 +36,15 @@
             <tr>
                 <td>
                     <input type="text" placeholder="author" th:field="*{author}">
+                    <p th:if="${#fields.hasErrors('author')}"> Author should be not not empty and less then 10 characters</p>
                 </td>
                 <td>
                     <input type="text" placeholder="book_title" th:field="*{title}">
+                    <p th:if="${#fields.hasErrors('title')}"> Title should be not empty, at list 4 symbols and less than 30 characters</p>
                 </td>
                 <td>
                     <input type="text" placeholder="size (pages)" th:field="*{size}">
+                    <p th:if="${#fields.hasErrors('size')}"> Size should be not null and less than 4 digits and not contains fractional part</p>
                 </td>
                 <td>
                     <input type="submit" value="save">
@@ -50,38 +53,41 @@
         </table>
     </form>
 
-    <form method="post" th:action="@{/books/remove}">
+    <form method="post" th:action="@{/books/remove}" th:object="${bookIdToRemove}">
         <table>
             <tr>
                 <td>
-                    <input type="text" placeholder="id number" th:name="bookIdToRemove">
+                    <input type="text" placeholder="id number" th:field="*{id}">
                 </td>
                 <td>
                     <input type="submit" value="remove">
+                </td>
+                <td th:if="${#fields.hasErrors()}">
+                    <p>Wrong id or not remove</p>
                 </td>
             </tr>
         </table>
     </form>
 
     <p> Delete by expression </p>
-    <form method="post" th:object="${book}" th:action="@{/books/remove-by-expr}">
+    <form method="post" th:object="${bookToRemoveByExpr}" th:action="@{/books/remove-by-expr}">
         <table>
             <tr>
                 <td> <input type="text" th:field="*{author}" placeholder="author expression"> </td>
                 <td> <input type="text" th:field="*{title}" placeholder="title expression"> </td>
-                <td> <input type="text" th:field="*{size}" placeholder="size expression"> </td>
+                <td> <input type="number" th:field="*{size}" placeholder="size expression"> </td>
                 <td> <input type="submit" value="delete"> </td>
             </tr>
         </table>
     </form>
 
     <p>Filter by expression</p>
-    <form method="post" th:action="@{/books/filter-by-expr}">
+    <form method="post" th:object="${bookToFilterByExpr}" th:action="@{/books/filter-by-expr}">
         <table>
             <tr>
-                <td> <input type="text" th:name="author" placeholder="author expression"> </td>
-                <td> <input type="text" th:name="title" placeholder="title expression"> </td>
-                <td> <input type="text" th:name="size" placeholder="size expression"> </td>
+                <td> <input type="text" th:field="*{author}" placeholder="author expression"> </td>
+                <td> <input type="text" th:field="*{title}" placeholder="title expression"> </td>
+                <td> <input type="number" th:field="*{size}" placeholder="size expression"> </td>
                 <td> <input type="submit" value="filter"> </td>
                 <td> <a th:href = "@{/books/shelf}"> reset filter </a> </td>
             </tr>

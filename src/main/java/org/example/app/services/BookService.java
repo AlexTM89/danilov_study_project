@@ -42,7 +42,7 @@ public class BookService implements DisposableBean, BeanPostProcessor {
     }
 
     public boolean removeBookById(String bookIdToRemove) {
-        boolean isDeleted =bookRepo.removeItemById(bookIdToRemove);
+        boolean isDeleted = bookRepo.removeItemById(bookIdToRemove);
         if (isDeleted) {
             logger.info("deleted book with id " + bookIdToRemove);
         } else {
@@ -55,22 +55,12 @@ public class BookService implements DisposableBean, BeanPostProcessor {
         if (filterBook == null) {
             return getAllBooks();
         }
-        // чтобы пустые поля фильтра не влияли на поиск - заменим их на регулярку, которая не будет на него влиять
-        if (filterBook.getTitle() == null || "".equals(filterBook.getTitle())) {
-            filterBook.setTitle(".*");
-        }
-        if (filterBook.getAuthor() == null || "".equals(filterBook.getAuthor())) {
-            filterBook.setAuthor(".*");
-        }
-        String filteredBookSize;
-        if (filterBook.getSize() != null) {
-            filteredBookSize = filterBook.getSize().toString();
-        } else {
-            filteredBookSize = ".*";
-        }
+        // строковые поля для поиска по регулярному выражению
+        final String title = (filterBook.getTitle() == null || "".equals(filterBook.getTitle())) ? ".*" : filterBook.getTitle();
+        final String author = (filterBook.getAuthor() == null || "".equals(filterBook.getAuthor())) ? ".*" : filterBook.getAuthor();
+        final String filteredBookSize = filterBook.getSize() != null ? filterBook.getSize().toString() : ".*";
 
         // проверяем каждую книгу, обращаем внимание, что у ее полей может быть значение null
-        String finalFilteredBookSize = filteredBookSize;
         return bookRepo.retrieveAll()
                 .stream()
                 .filter(book -> {
@@ -80,9 +70,9 @@ public class BookService implements DisposableBean, BeanPostProcessor {
                     if (book.getSize() != null) {
                         bookSize = book.getSize().toString();
                     }
-                    return compareWithNull.apply(book.getAuthor(), filterBook.getAuthor())
-                            & compareWithNull.apply(book.getTitle(), filterBook.getTitle())
-                            & compareWithNull.apply(bookSize, finalFilteredBookSize);
+                    return compareWithNull.apply(book.getAuthor(), author)
+                            & compareWithNull.apply(book.getTitle(), title)
+                            & compareWithNull.apply(bookSize, filteredBookSize);
 
                 }
                 ).collect(Collectors.toList());
