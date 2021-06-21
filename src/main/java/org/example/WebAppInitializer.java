@@ -3,6 +3,7 @@ package org.example;
 import org.apache.log4j.Logger;
 import org.example.app.config.RootApplicationContext;
 import org.example.web.config.WebContextConfig;
+import org.h2.server.web.WebServlet;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
@@ -10,7 +11,6 @@ import org.springframework.web.context.support.AnnotationConfigWebApplicationCon
 import org.springframework.web.servlet.DispatcherServlet;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 
 @Configuration
@@ -38,6 +38,10 @@ public class WebAppInitializer implements WebApplicationInitializer {
 
         logger.info("dispatcher ready");
 
+        ServletRegistration.Dynamic databaseServlet = servletContext.addServlet("h2-console", new WebServlet());
+        databaseServlet.setLoadOnStartup(2);
+        databaseServlet.addMapping("/console/*");
 
+        logger.info("database h2-console config ready");
     }
 }

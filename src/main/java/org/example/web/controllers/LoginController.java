@@ -5,6 +5,8 @@ import org.example.app.exceptions.BookShelfLoginException;
 import org.example.app.services.LoginService;
 import org.example.web.dto.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +17,12 @@ public class LoginController {
 
     private final Logger logger = Logger.getLogger(LoginController.class);
     private final LoginService loginService;
+    private final BookShelfController bookShelfController;
 
     @Autowired
-    public LoginController(LoginService loginService) {
+    public LoginController(LoginService loginService, BookShelfController bookShelfController) {
         this.loginService = loginService;
+        this.bookShelfController = bookShelfController;
     }
 
     @GetMapping
@@ -28,16 +32,23 @@ public class LoginController {
         return "login_page";
     }
 
-    @PostMapping("/auth")
-    public String authenticate(LoginForm loginFrom) throws BookShelfLoginException {
-        if (loginService.authenticate(loginFrom)) {
-            logger.info("login OK redirect to book shelf");
-            return "redirect:/books/shelf";
-        } else {
-            logger.error("login FAIL - goto 404 page");
-            throw new BookShelfLoginException("login failed - invalid username or password entered");
-        }
-    }
+//    @PostMapping("/auth")
+//    данный обработчик не работает из-за использования custom authenticate provider
+//    public String authenticate(LoginForm loginFrom, Model model) throws BookShelfLoginException {
+//        if (loginService.authenticate(loginFrom)) {
+//            return "redirect:/books/shelf";
+//        } else {
+//            return "redirect:/errors/404";
+//        }
+//        logger.info("invoke authenticate method POST for /login/auth");
+//        if (loginService.authenticate(loginFrom)) {
+//            logger.info("login OK redirect to book shelf");
+//            return "redirect:/books/shelf";
+//        } else {
+//            logger.error("login FAIL - goto 404 page");
+//            throw new BookShelfLoginException("login failed - invalid username or password entered");
+//        }
+//    }
 
     @GetMapping("/users")
     public String listUsers(Model model) {
@@ -48,7 +59,7 @@ public class LoginController {
         return "user_page";
     }
 
-    @PostMapping
+    @PostMapping("/users")
     public String registerUser(@ModelAttribute("newUser") LoginForm form) {
         logger.info("register " + form);
         loginService.registerUser(form);

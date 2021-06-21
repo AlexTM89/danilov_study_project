@@ -41,12 +41,12 @@
   <br>
   <div>
     <p>create user</p>
-    <form method="post" th:object="${newUser}" th:action="@{/login}">
+    <form method="post" th:object="${newUser}" th:action="@{/login/users}">
       <input class="edit_item" type="text" placeholder="enter name" th:field="*{username}">
       <input class="edit_item" type="password" th:field="*{password}" placeholder = "enter password">
       <input class="edit_item" type="submit" value="create!">
     </form>
-    <a th:href="@{/login}"> Goto login page </a>
+    <a href="/simple_mvc_war_exploded/login"> Goto login page </a>
   </div>
 </div>
 </body>

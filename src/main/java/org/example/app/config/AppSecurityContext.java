@@ -1,6 +1,7 @@
 package org.example.app.config;
 
 import org.apache.log4j.Logger;
+import org.example.app.services.UsersAuthenticationProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -16,6 +17,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AppSecurityContext extends WebSecurityConfigurerAdapter {
 
     Logger logger = Logger.getLogger(AppSecurityContext.class);
+
+    private final UsersAuthenticationProvider authenticationProvider;
+
+    public AppSecurityContext(UsersAuthenticationProvider usersAuthenticationProvider) {
+        this.authenticationProvider = usersAuthenticationProvider;
+    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -34,6 +41,8 @@ public class AppSecurityContext extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        http.headers().frameOptions().disable();
+
         http
                 .csrf().disable()
                 .authorizeRequests()
@@ -41,16 +50,19 @@ public class AppSecurityContext extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()
-                .loginPage("/login")
-                .loginProcessingUrl("/login/auth")
-                .defaultSuccessUrl("/books/shelf", true)
-                .failureForwardUrl("/login");
+                    .loginPage("/login")
+                    .loginProcessingUrl("/login/auth")
+                    .defaultSuccessUrl("/books/shelf", true)
+                    .failureForwardUrl("/login");
+        http.authenticationProvider(authenticationProvider);
     }
 
     @Override
     public void configure(WebSecurity web) {
         web
                 .ignoring()
-                .antMatchers("/images/**");
+                .antMatchers("/images/**")
+                .antMatchers("/login/users")
+                .antMatchers("/errors/*");
     }
 }

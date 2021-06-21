@@ -13,9 +13,9 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 @Component
-public class IdProvider implements InitializingBean, DisposableBean, BeanPostProcessor {
-    public String provideId(Book book) {
-        return this.hashCode() + "_" + book.hashCode();
+public class IdProvider implements InitializingBean, DisposableBean {
+    public Integer provideId(Book book) {
+        return book.getId();
     }
 
     private final Logger logger = Logger.getLogger(IdProvider.class);
@@ -54,17 +54,5 @@ public class IdProvider implements InitializingBean, DisposableBean, BeanPostPro
     @PreDestroy
     private void idProviderPreDestroy() {
         logger.info("invoked pre destroy method annotated @PreDestroy");
-    }
-
-    @Override
-    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-        logger.info("invoked postProcessBeforeInitialization for bean " + beanName);
-        return null;
-    }
-
-    @Override
-    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        logger.info("invoked postProcessAfterInitialization for bean " + beanName);
-        return null;
     }
 }

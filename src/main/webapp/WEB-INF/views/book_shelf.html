@@ -36,15 +36,15 @@
             <tr>
                 <td>
                     <input type="text" placeholder="author" th:field="*{author}">
-                    <p th:if="${#fields.hasErrors('author')}"> Author should be not not empty and less then 10 characters</p>
+                    <p th:if="${#fields.hasErrors('author')}"> Author should be not not empty<br> and less then 10 characters</p>
                 </td>
                 <td>
                     <input type="text" placeholder="book_title" th:field="*{title}">
-                    <p th:if="${#fields.hasErrors('title')}"> Title should be not empty, at list 4 symbols and less than 30 characters</p>
+                    <p th:if="${#fields.hasErrors('title')}"> Title should be not empty,<br> at list 4 characters<br> and less than 30 characters</p>
                 </td>
                 <td>
                     <input type="text" placeholder="size (pages)" th:field="*{size}">
-                    <p th:if="${#fields.hasErrors('size')}"> Size should be not null and less than 4 digits and not contains fractional part</p>
+                    <p th:if="${#fields.hasErrors('size')}"> Size should be not null <br> and less than 4 digits <br> and not contains fractional part</p>
                 </td>
                 <td>
                     <input type="submit" value="save">
@@ -52,7 +52,16 @@
             </tr>
         </table>
     </form>
-
+    <br>
+    <form method="post" th:action="@{/books/upload-file}" enctype="multipart/form-data">
+        <table>
+            <tr>
+                <td><input type = "file" th:name="file"> </td>
+                <td> <input type = "submit" value = "upload"> </td>
+            </tr>
+        </table>
+    </form>
+    <a href="/simple_mvc_war_exploded/books/files"> load files from server </a>
     <form method="post" th:action="@{/books/remove}" th:object="${bookIdToRemove}">
         <table>
             <tr>
@@ -68,7 +77,6 @@
             </tr>
         </table>
     </form>
-
     <p> Delete by expression </p>
     <form method="post" th:object="${bookToRemoveByExpr}" th:action="@{/books/remove-by-expr}">
         <table>

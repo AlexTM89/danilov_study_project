@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
 @Valid
 public class Book {
 
-    private String id;
+    private Integer id;
     @NotEmpty
     @Size(min = 1, max = 10)
     private String author;
@@ -20,11 +20,11 @@ public class Book {
     @Digits(integer = 4, fraction = 0)
     private Integer size;
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

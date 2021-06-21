@@ -6,7 +6,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class BookService implements DisposableBean, BeanPostProcessor {
         }
     }
 
-    public boolean removeBookById(String bookIdToRemove) {
+    public boolean removeBookById(Integer bookIdToRemove) {
         boolean isDeleted = bookRepo.removeItemById(bookIdToRemove);
         if (isDeleted) {
             logger.info("deleted book with id " + bookIdToRemove);
@@ -55,7 +54,7 @@ public class BookService implements DisposableBean, BeanPostProcessor {
         if (filterBook == null) {
             return getAllBooks();
         }
-        // строковые поля для поиска по регулярному выражению
+        // строковые поля для поиска по регулярному выражению, чтобы не менять исходный объект
         final String title = (filterBook.getTitle() == null || "".equals(filterBook.getTitle())) ? ".*" : filterBook.getTitle();
         final String author = (filterBook.getAuthor() == null || "".equals(filterBook.getAuthor())) ? ".*" : filterBook.getAuthor();
         final String filteredBookSize = filterBook.getSize() != null ? filterBook.getSize().toString() : ".*";
@@ -97,7 +96,7 @@ public class BookService implements DisposableBean, BeanPostProcessor {
     }
 
     @Override
-    public void destroy() throws Exception {
+    public void destroy() {
         logger.info("invoked destroy from DisposableBean");
     }
 }
