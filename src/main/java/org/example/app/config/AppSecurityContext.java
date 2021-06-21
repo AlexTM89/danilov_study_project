@@ -62,7 +62,6 @@ public class AppSecurityContext extends WebSecurityConfigurerAdapter {
         web
                 .ignoring()
                 .antMatchers("/images/**")
-                .antMatchers("/login/users")
-                .antMatchers("/errors/*");
+                .antMatchers("/login/users");
     }
 }

@@ -1,6 +1,7 @@
 package org.example.web.controllers;
 
 import org.apache.log4j.Logger;
+import org.example.app.exceptions.UploadNullFileException;
 import org.example.app.services.FileService;
 import org.example.app.services.BookService;
 import org.example.web.dto.Book;
@@ -142,8 +143,14 @@ public class BookShelfController {
     }
 
     @PostMapping(value = "/upload-file")
-    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws Exception {
+    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws UploadNullFileException, IOException {
+        logger.info("starting upload with file named '" + file.getName() + "'");
+
         String fileName = file.getOriginalFilename();
+        if (fileName.isEmpty()) {
+
+            throw new UploadNullFileException("cannot upload empty file");
+        }
         byte[] fileContent = file.getBytes();
 
         // create dir
@@ -179,9 +186,11 @@ public class BookShelfController {
         fileService.downloadFile(fileName, response);
     }
 
-    @ExceptionHandler({Exception.class})
+    @ExceptionHandler({IOException.class, UploadNullFileException.class})
     public String handleBookShelfExceptions(Model model, Exception e) {
+        logger.info("handle exceptions: " + e.getMessage());
         model.addAttribute("errorMessage", e.getMessage());
-        return "errors/404";
+        logger.info("goto error page 405");
+        return "errors/405";
     }
 }

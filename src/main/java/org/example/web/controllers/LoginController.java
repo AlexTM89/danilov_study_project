@@ -62,8 +62,9 @@ public class LoginController {
         return "redirect:/login/users";
     }
 
-    @ExceptionHandler({BookShelfLoginException.class})
-    public String handleLoginException(Model model, BookShelfLoginException e) {
+    @ExceptionHandler(Exception.class)
+    public String handleLoginException(Model model, Exception e) {
+        logger.info("handle error " + e.getMessage());
         model.addAttribute("errorMessage", e.getMessage());
         return "errors/404";
     }
