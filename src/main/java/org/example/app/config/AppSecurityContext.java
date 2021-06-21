@@ -16,7 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableWebSecurity
 public class AppSecurityContext extends WebSecurityConfigurerAdapter {
 
-    Logger logger = Logger.getLogger(AppSecurityContext.class);
+    final Logger logger = Logger.getLogger(AppSecurityContext.class);
 
     private final UsersAuthenticationProvider authenticationProvider;
 

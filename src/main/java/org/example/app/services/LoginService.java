@@ -4,14 +4,13 @@ import org.apache.log4j.Logger;
 import org.example.web.dto.LoginForm;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
 @Service
 public class LoginService {
 
-    private Logger logger = Logger.getLogger(LoginService.class);
+    private final Logger logger = Logger.getLogger(LoginService.class);
     private final LoginRepository loginRepository;
 
     @Autowired

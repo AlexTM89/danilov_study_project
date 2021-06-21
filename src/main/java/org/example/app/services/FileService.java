@@ -1,4 +1,4 @@
-package org.example.app.config;
+package org.example.app.services;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
@@ -16,11 +16,12 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Component
 public class FileService {
 
-    Logger logger = Logger.getLogger(FileService.class);
+    final Logger logger = Logger.getLogger(FileService.class);
 
     public List<String> getFiles() {
         List<String> result = new ArrayList<>();
@@ -30,7 +31,7 @@ public class FileService {
             return result;
         }
 
-        for (File file: dir.listFiles()) {
+        for (File file: Objects.requireNonNull(dir.listFiles())) {
             result.add(file.getAbsolutePath());
         }
 

@@ -2,11 +2,8 @@ package org.example.app.services;
 
 import org.apache.log4j.Logger;
 import org.example.web.dto.Book;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -48,7 +45,7 @@ public class IdProvider implements InitializingBean, DisposableBean {
 
     @PostConstruct
     private void idProviderPostConstruct() {
-        logger.info("invoked post construct method annotaded @PostConstruct");
+        logger.info("invoked post construct method annotated @PostConstruct");
     }
 
     @PreDestroy

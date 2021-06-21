@@ -1,31 +1,23 @@
 package org.example.web.controllers;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-import org.example.app.config.FileService;
+import org.example.app.services.FileService;
 import org.example.app.services.BookService;
 import org.example.web.dto.Book;
 import org.example.web.dto.BookIdToRemove;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.awt.*;
 import java.io.*;
-import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Controller
@@ -34,7 +26,6 @@ public class BookShelfController {
 
     private final Logger logger = Logger.getLogger(BookShelfController.class);
     private final BookService bookService;
-    private final CommonsMultipartResolver multipartResolver;
     private final FileService fileService;
 
     /**
@@ -78,10 +69,8 @@ public class BookShelfController {
 
     @Autowired
     public BookShelfController(BookService bookService,
-                               CommonsMultipartResolver commonsMultipartResolver,
                                FileService fileService) {
         this.bookService = bookService;
-        this.multipartResolver = commonsMultipartResolver;
         this.fileService = fileService;
     }
 

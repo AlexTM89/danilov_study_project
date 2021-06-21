@@ -19,7 +19,7 @@ public class BookRepository implements ProjectRepository<Book>, ApplicationConte
     private final Logger logger = Logger.getLogger(BookRepository.class);
     ApplicationContext context;
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+    private final NamedParameterJdbcTemplate jdbcTemplate;
 
     public BookRepository(NamedParameterJdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;

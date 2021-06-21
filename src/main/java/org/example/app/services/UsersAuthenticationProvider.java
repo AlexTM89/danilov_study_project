@@ -15,7 +15,7 @@ import java.util.Collections;
 @Component
 public class UsersAuthenticationProvider implements AuthenticationProvider {
 
-    private LoginService loginService;
+    private final LoginService loginService;
     private final Logger logger = Logger.getLogger(UsersAuthenticationProvider.class);
 
     @Autowired
