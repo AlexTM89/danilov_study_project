@@ -2,8 +2,8 @@ package org.example.web.controllers;
 
 import org.apache.log4j.Logger;
 import org.example.app.exceptions.UploadNullFileException;
-import org.example.app.services.FileService;
 import org.example.app.services.BookService;
+import org.example.app.services.FileService;
 import org.example.web.dto.Book;
 import org.example.web.dto.BookIdToRemove;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.*;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequestMapping(value = "/books")
@@ -29,42 +29,57 @@ public class BookShelfController {
     private final BookService bookService;
     private final FileService fileService;
 
+    // вспомогательная функция вытаскивания из модели атрибута
+    private <T> T getModelObject(Model model, String param) {
+        try {
+            if (model.containsAttribute(param)) {
+                // небезопасно, но для учебного проекта - самое оно, код уменьшает хорошо
+                return (T) model.getAttribute(param);
+            } else {
+                return null;
+            }
+        } catch (RuntimeException e) {
+           return null;
+        }
+    }
+
     /**
      * Возвращает подготовленный book_shelf
      * в него надо добавить некоторые объекты - они представлены параметрами
      * если в параметр передать null - будет использовано значение по-умолчанию (кроме модели)
      */
-    public String prepareBookShelf(Model model,
-                                    Book book,
-                                    BookIdToRemove toRemove,
-                                    Book toRemoveByExpr,
-                                    Book toFilterByExpr,
-                                    List<Book> bookList) {
+    public String prepareBookShelf(Model model) {
+        Book book = getModelObject(model, "book");
         if (book == null) {
-            model.addAttribute("book", new Book());
-        } else {
-            model.addAttribute("book", book);
+            book = new Book();
         }
-        if (toRemove == null) {
-            model.addAttribute("bookIdToRemove", new BookIdToRemove());
-        } else {
-            model.addAttribute("bookIdToRemove", toRemove);
+
+        BookIdToRemove bookIdToRemove = getModelObject(model, "bookIdToRemove");
+        if (bookIdToRemove == null) {
+            bookIdToRemove = new BookIdToRemove();
         }
-        if (toRemoveByExpr == null) {
-            model.addAttribute("bookToRemoveByExpr", new Book());
-        } else {
-            model.addAttribute("bookToRemoveByExpr", toRemoveByExpr);
+
+        Book bookToRemoveByExpr = getModelObject(model, "bookToRemoveByExpr");
+        if (bookToRemoveByExpr == null) {
+            bookToRemoveByExpr = new Book();
         }
-        if (toFilterByExpr == null) {
-            model.addAttribute("bookToFilterByExpr", new Book());
-        } else {
-            model.addAttribute("bookToFilterByExpr", toFilterByExpr);
+
+        Book bookToFilterByExpr = getModelObject(model, "bookToFilterByExpr");
+        if (bookToFilterByExpr == null) {
+            bookToFilterByExpr = new Book();
         }
+
+        List<Book> bookList = getModelObject(model, "bookList");
         if (bookList == null) {
-            model.addAttribute("bookList", bookService.getAllBooks());
-        } else {
-            model.addAttribute("bookList", bookList);
+            bookList = bookService.getAllBooks();
         }
+
+        model.addAttribute("book", book);
+        model.addAttribute("bookIdToRemove", bookIdToRemove);
+        model.addAttribute("bookToRemoveByExpr", bookToRemoveByExpr);
+        model.addAttribute("bookToFilterByExpr", bookToFilterByExpr);
+        model.addAttribute("bookList", bookList);
+
         return "book_shelf";
     }
 
@@ -78,25 +93,16 @@ public class BookShelfController {
     @GetMapping("/shelf")
     public String books(Model model) {
         logger.info("got book shelf");
-        return prepareBookShelf(model, null, null, null, null, null);
+        return prepareBookShelf(model);
     }
 
     @PostMapping("/save")
     public String saveBook(@Valid Book book,
                            BindingResult bindingResult,
-                           Model model,
-                           @ModelAttribute("bookIdToRemove") BookIdToRemove bookIdToRemove,
-                           @ModelAttribute("bookToRemoveByExpr") Book bookToRemoveByExpr,
-                           @ModelAttribute("bookToFilterByExpr") Book bookToFilterByExpr,
-                           @ModelAttribute("bookList") ArrayList<Book> bookList) {
+                           Model model) {
         if (bindingResult.hasErrors()) {
             logger.warn("cannot save - errors in book found");
-            return prepareBookShelf(model,
-                    book,
-                    bookIdToRemove,
-                    bookToRemoveByExpr,
-                    bookToFilterByExpr,
-                    bookList);
+            return prepareBookShelf(model);
         } else {
             bookService.saveBook(book);
             return "redirect:/books/shelf";
@@ -106,18 +112,10 @@ public class BookShelfController {
     @PostMapping("/remove")
     public String removeBook(@Valid BookIdToRemove bookIdToRemove,
                              BindingResult bindingResult,
-                             Model model,
-                             @ModelAttribute("book") Book book,
-                             @ModelAttribute("bookToRemoveByExpr") Book bookToRemoveByExpr,
-                             @ModelAttribute("bookToFilterByExpr") Book bookToFilterByExpr,
-                             @ModelAttribute("bookList") ArrayList<Book> bookList) {
+                             Model model) {
         if (bindingResult.hasErrors()) {
-            return prepareBookShelf(model,
-                    book,
-                    bookIdToRemove,
-                    bookToRemoveByExpr,
-                    bookToFilterByExpr,
-                    bookList);
+            // определим из модели список атрибутов
+            return prepareBookShelf(model);
         } else {
             bookService.removeBookById(bookIdToRemove.getId());
             return "redirect:/books/shelf";
@@ -132,23 +130,20 @@ public class BookShelfController {
         return "redirect:/books/shelf";
     }
     @PostMapping("/filter-by-expr")
-    public String filterBooksByExpr(Model model, @ModelAttribute("bookToFilterByExpr") Book filterBook) {
+    public String filterBooksByExpr(Model model,
+                                    @ModelAttribute("bookToFilterByExpr") Book filterBook) {
         logger.info("got filter params: " + filterBook);
-        return prepareBookShelf(model,
-                (Book) model.getAttribute("book"),
-                (BookIdToRemove) model.getAttribute("bookIdToRemove"),
-                (Book) model.getAttribute("bookToRemoveByExpr"),
-                filterBook,
-                bookService.getBooksFiltered(filterBook));
+        model.addAttribute("bookList", bookService.getBooksFiltered(filterBook));
+        return prepareBookShelf(model);
     }
 
     @PostMapping(value = "/upload-file")
-    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws UploadNullFileException, IOException {
+    public String uploadFile(@RequestParam("file") MultipartFile file) throws UploadNullFileException, IOException {
         logger.info("starting upload with file named '" + file.getName() + "'");
 
         String fileName = file.getOriginalFilename();
-        if (fileName.isEmpty()) {
-
+        Optional<String> fileNameOpt = Optional.ofNullable(fileName);
+        if (!fileNameOpt.isPresent() || fileNameOpt.get().isEmpty() ) {
             throw new UploadNullFileException("cannot upload empty file");
         }
         byte[] fileContent = file.getBytes();
@@ -164,10 +159,6 @@ public class BookShelfController {
         // create file
         try (OutputStream stream = new BufferedOutputStream(new FileOutputStream(Paths.get(dir.getAbsolutePath(), fileName).toString()))) {
             stream.write(fileContent);
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            model.addAttribute("errorMessage", e.getMessage());
-            return "errors/404";
         }
         return "redirect:/books/shelf";
     }
@@ -180,8 +171,7 @@ public class BookShelfController {
 
     @PostMapping(value = "/files")
     public void loadFile(@ModelAttribute("filename") String fileName,
-                           HttpServletResponse response,
-                           Model model ) {
+                           HttpServletResponse response) {
         logger.info("get filename " + fileName);
         fileService.downloadFile(fileName, response);
     }

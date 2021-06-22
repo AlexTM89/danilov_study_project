@@ -9,6 +9,7 @@
         <module name="mod1_lesson6" />
         <module name="simple_mvc" />
         <module name="danilov_skillboks_spring_project" />
+        <module name="danilov_study_project" />
       </profile>
     </annotationProcessing>
   </component>

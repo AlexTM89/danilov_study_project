@@ -61,7 +61,7 @@
             </tr>
         </table>
     </form>
-    <a href="/simple_mvc_war_exploded/books/files"> load files from server </a>
+    <a th:href="@{/books/files}"> load files from server </a>
     <form method="post" th:action="@{/books/remove}" th:object="${bookIdToRemove}">
         <table>
             <tr>
